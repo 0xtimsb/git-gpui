@@ -1,0 +1,18 @@
+[package]
+name = "git-gpui"
+version = "0.1.0"
+edition = "2021"
+
+[profile.dev]
+incremental = true
+
+[dependencies]
+gpui = { git = "https://github.com/zed-industries/zed", package = "gpui" }
+ui = { git = "https://github.com/zed-industries/zed", package = "ui" }
+ui_macros = { git = "https://github.com/zed-industries/zed", package = "ui_macros" }
+theme = { git = "https://github.com/zed-industries/zed", package = "theme" }
+settings = { git = "https://github.com/zed-industries/zed", package = "settings" }
+ui_input = { git = "https://github.com/zed-industries/zed", package = "ui_input" }
+language = { git = "https://github.com/zed-industries/zed", package = "language" }
+editor = { git = "https://github.com/zed-industries/zed", package = "editor" }
+project = { git = "https://github.com/zed-industries/zed", package = "project" }
