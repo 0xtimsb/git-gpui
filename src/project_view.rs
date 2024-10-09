@@ -1,56 +1,31 @@
 use gpui::*;
+use std::path::PathBuf;
 use ui::prelude::*;
-use ui_input::TextField;
 
 pub struct ProjectView {
     name: String,
-    todos: Vec<String>,
-    input: View<TextField>,
-}
-
-fn get_text(element: &View<TextField>, cx: &mut WindowContext) -> String {
-    element
-        .read(cx)
-        .editor()
-        .read(cx)
-        .text(cx)
-        .trim()
-        .to_string()
+    selected_directory: Option<PathBuf>,
 }
 
 impl ProjectView {
-    pub fn new(name: String, cx: &mut ViewContext<Self>) -> Self {
+    pub fn new(name: String) -> Self {
         Self {
             name,
-            todos: Vec::new(),
-            input: cx.new_view(|cx| TextField::new(cx, "new-todo", "new todo")),
+            selected_directory: None,
         }
     }
 
-    fn add_todo(&mut self, cx: &mut ViewContext<Self>) {
-        let new_todo = get_text(&self.input, cx);
-        if !new_todo.is_empty() {
-            self.todos.push(new_todo);
-            self.input.update(cx, |input, cx| {
-                input
-                    .editor()
-                    .update(cx, |editor, cx| editor.set_text("", cx))
-            });
-        }
-    }
-
-    fn delete_todo(&mut self, index: usize) {
-        if index < self.todos.len() {
-            self.todos.remove(index);
+    fn open_project(&mut self, cx: &mut ViewContext<Self>) {
+        // Use the native file dialog to select a directory
+        if let Some(path) = rfd::FileDialog::new().pick_folder() {
+            self.selected_directory = Some(path);
+            cx.notify();
         }
     }
 }
 
 impl Render for ProjectView {
     fn render(&mut self, cx: &mut ViewContext<Self>) -> impl IntoElement {
-        let todos = self.todos.clone();
-        let name = self.name.clone();
-
         div()
             .flex()
             .flex_col()
@@ -60,30 +35,21 @@ impl Render for ProjectView {
             .bg(rgb(0x1f2335))
             .text_color(rgb(0xffffff))
             .children(vec![
-                div().child(Label::new(name)),
-                div().flex().gap(Rems(0.5)).children(vec![
-                    div().child(self.input.clone().into_element()),
-                    div().child(
-                        Button::new("add", "add").on_click(cx.listener(|this, _, cx| {
-                            this.add_todo(cx);
-                        })),
-                    ),
-                ]),
-                div()
-                    .flex()
-                    .flex_col()
-                    .gap(Rems(0.5))
-                    .children(todos.iter().enumerate().map(|(index, todo)| {
-                        let todo = todo.clone();
-                        div().flex().items_center().gap(Rems(0.5)).children(vec![
-                            div().child(Label::new(todo)),
-                            div().child(Button::new(("delete", index), "x").on_click(cx.listener(
-                                move |this, _, _cx| {
-                                    this.delete_todo(index);
-                                },
-                            ))),
-                        ])
-                    })),
+                div().child(Label::new(self.name.clone())),
+                div().child(Button::new("op", "Open Project").on_click(cx.listener(
+                    |this, _event, cx| {
+                        this.open_project(cx);
+                    },
+                ))),
+                self.selected_directory
+                    .as_ref()
+                    .map(|path| {
+                        div().child(Label::new(format!(
+                            "Selected directory: {}",
+                            path.display()
+                        )))
+                    })
+                    .unwrap_or_else(|| div().child(Label::new("No directory selected"))),
             ])
     }
 }

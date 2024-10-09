@@ -16,3 +16,4 @@ ui_input = { git = "https://github.com/zed-industries/zed", package = "ui_input"
 language = { git = "https://github.com/zed-industries/zed", package = "language" }
 editor = { git = "https://github.com/zed-industries/zed", package = "editor" }
 project = { git = "https://github.com/zed-industries/zed", package = "project" }
+rfd = "0.11"

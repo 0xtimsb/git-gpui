@@ -27,7 +27,7 @@ fn main() {
                 ))),
                 ..Default::default()
             },
-            |cx| cx.new_view(|cx| ProjectView::new("rust gpui test".to_string(), cx)),
+            |cx| cx.new_view(|cx| ProjectView::new("rust gpui test".to_string())),
         );
     });
 }
